@@ -122,7 +122,7 @@ export default function Notifications({ user }) {
             </div>
           </div>
           <button
-            disabled={!otherOnline}
+            // disabled={!otherOnline}
             onClick={sendPing}
             className="rounded-lg bg-sky-600 text-white px-4 py-2 text-sm font-medium hover:bg-sky-700 disabled:opacity-40"
           >
