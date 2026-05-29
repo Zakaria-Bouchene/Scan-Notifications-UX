@@ -5,12 +5,12 @@ import Notifications from "./pages/Notifications.jsx";
 import Login from "./pages/Login.jsx";
 import { useSocketStatus } from "./hooks/useSocket.js";
 import { socket } from "./lib/socket.js";
+import { requestForToken, onMessageListener } from "./firebase";
 
 const navItem = ({ isActive }) =>
-  `px-3 py-1.5 rounded-md text-sm font-medium transition ${
-    isActive
-      ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
-      : "text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800"
+  `px-3 py-1.5 rounded-md text-sm font-medium transition ${isActive
+    ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900"
+    : "text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800"
   }`;
 
 export default function App() {
@@ -23,7 +23,13 @@ export default function App() {
     document.documentElement.classList.toggle("dark", dark);
     localStorage.setItem("dark", dark ? "1" : "0");
   }, [dark]);
-
+  useEffect(() => { // Ask permission and get FCM token
+    requestForToken(); // Listen foreground notifications
+    onMessageListener().then((payload) => {
+      console.log("Foreground notification:", payload); // OPTIONAL browser popup while app open
+      new Notification(payload.notification.title, { body: payload.notification.body, icon: "/icon-192.png" });
+    }).catch((err) => console.log("Notification listener error:", err));
+  }, []);
   // re-auth on reconnect
   useEffect(() => {
     if (!user) return;
